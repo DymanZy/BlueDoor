@@ -112,7 +112,7 @@ public class BluetoothUtil {
             bluetoothManager = (BluetoothManager)context.getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
-        if (mBluetoothAdapter!=null && !isScanning){
+        if (mBluetoothAdapter != null && !isScanning){
             if (mBluetoothAdapter.startLeScan(bleScanCallback)) {
                 isScanning = true;
                 Toast.makeText(context,"正在扫描蓝牙设备", Toast.LENGTH_SHORT).show();
