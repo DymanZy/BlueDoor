@@ -1,4 +1,4 @@
-package com.dyman.bluedoor.util;
+package com.dyman.componentdoor.util;
 
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;

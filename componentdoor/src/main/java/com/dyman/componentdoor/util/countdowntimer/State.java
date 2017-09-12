@@ -1,4 +1,4 @@
-package com.dyman.bluedoor.util.countdowntimer;
+package com.dyman.componentdoor.util.countdowntimer;
 
 /**
  * Created by xe on 16-11-21.

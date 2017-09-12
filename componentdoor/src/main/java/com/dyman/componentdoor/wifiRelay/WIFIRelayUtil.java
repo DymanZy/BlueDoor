@@ -1,12 +1,10 @@
-package com.dyman.bluedoor.wifiRelay;
+package com.dyman.componentdoor.wifiRelay;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-
-import com.dyman.bluedoor.Global;
-import com.dyman.bluedoor.util.ToastUtil;
+import com.dyman.componentdoor.Global;
+import com.dyman.componentdoor.util.ToastUtil;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,6 +13,7 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import com.orhanobut.logger.Logger;
 
 /**
  * Created by thinkjoy on 2017/8/22.
@@ -50,12 +49,12 @@ public class WIFIRelayUtil{
         mContext = context;
         try {
             UDPAddress = InetAddress.getByName(Global.Const.UDP_BROADCAST_ADDRESS);
-            Log.e("TAG", "wifi继电器-------广播地址"+UDPAddress);
+            Logger.e("wifi继电器-------广播地址"+UDPAddress);
             new ScanThread().start();
 //             new TCPConnectThread().start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
-            Log.e("TAG", "wifi继电器-------广播地址获取失败");
+            Logger.e("wifi继电器-------广播地址获取失败");
         }
     }
 
@@ -96,7 +95,7 @@ public class WIFIRelayUtil{
                 mMulSocket.send(dataPacket);
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("TAG","wifi继电器-------ms初始化失败  "+e.toString());
+                Logger.e("wifi继电器-------ms初始化失败  "+e.toString());
                 return;
             }
             int intWaitTime = 0;
@@ -108,7 +107,7 @@ public class WIFIRelayUtil{
                     udpResult = new String(recPacket.getData()).trim();
                     if (udpResult.indexOf(Global.Const.relayUUID)!=-1){    //找到设备
                         connectIP = recPacket.getAddress().toString();
-                        Log.e("TAG","wifi继电器-------设备的ip："+connectIP);
+                        Logger.e("wifi继电器-------设备的ip："+connectIP);
                         if(connectIP.indexOf("/")!=-1)
                         {
                             connectIP = connectIP.substring(connectIP.indexOf("/")+1);
@@ -119,13 +118,13 @@ public class WIFIRelayUtil{
                     }
                 } catch (SocketException e) {
                     e.printStackTrace();
-                    Log.e("TAG","wifi继电器-------ms出错：");
+                    Logger.e("wifi继电器-------ms出错：");
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e("TAG","wifi继电器-------Timeout：");
+                    Logger.e("wifi继电器-------Timeout：");
                 }
                 if (++intWaitTime>3){
-                    Log.e("TAG","wifi继电器-------未找到设备：");
+                    Logger.e("wifi继电器-------未找到设备：");
                     isConnecting = false;
                     mContext.sendBroadcast(new Intent(ACTION_DEVICE_NOT_FIND));
                     return;
@@ -144,20 +143,20 @@ public class WIFIRelayUtil{
                 serverAddr = InetAddress.getByName(connectIP);
             } catch (UnknownHostException e) {
                 e.printStackTrace();
-                Log.e("TAG","wifi继电器-------serverAddr初始化出错：");
+                Logger.e("wifi继电器-------serverAddr初始化出错：");
             }
             if(socket==null)
             {
                 try {
                     socket = new Socket(serverAddr, Global.Const.TcpPort);
                     if (socket.isConnected()){
-                        Log.e("TAG","wifi继电器-------tcp连接成功：");
+                        Logger.e("wifi继电器-------tcp连接成功：");
                         isConnected = true;
                        mContext.sendBroadcast(new Intent(ACTION_DEVICE_CONNECTED));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e("TAG","wifi继电器-------连接失败");
+                    Logger.e("wifi继电器-------连接失败");
                     mContext.sendBroadcast(new Intent(ACTION_DEVICE_CONNECT_FAIL));
                 }
             }

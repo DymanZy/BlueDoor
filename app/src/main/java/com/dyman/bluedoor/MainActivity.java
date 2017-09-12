@@ -3,18 +3,11 @@ package com.dyman.bluedoor;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.dyman.bluedoor.bluetooth.BluetoothUtil;
-import com.dyman.bluedoor.util.DoorUtil;
-import com.dyman.bluedoor.util.ToastUtil;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.dyman.componentdoor.util.DoorUtil;
 
 public class MainActivity extends Activity {
 
@@ -39,7 +32,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDoorUtil = new DoorUtil(this, mHandler);
+        mDoorUtil = new DoorUtil(this);
         openDoorBtn = findViewById(R.id.openDoor_btn);
         closeDoorBtn = findViewById(R.id.closeDoor_btn);
 

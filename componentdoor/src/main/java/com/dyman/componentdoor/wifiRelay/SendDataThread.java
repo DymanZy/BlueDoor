@@ -1,4 +1,4 @@
-package com.dyman.bluedoor.wifiRelay;
+package com.dyman.componentdoor.wifiRelay;
 
 import java.io.IOException;
 import java.io.OutputStream;

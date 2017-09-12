@@ -1,4 +1,4 @@
-package com.dyman.bluedoor.util.countdowntimer;
+package com.dyman.componentdoor.util.countdowntimer;
 
 import android.os.Handler;
 import android.os.SystemClock;

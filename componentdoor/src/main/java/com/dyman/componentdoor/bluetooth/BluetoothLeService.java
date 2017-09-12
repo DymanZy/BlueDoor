@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.dyman.bluedoor.bluetooth;
+package com.dyman.componentdoor.bluetooth;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -30,13 +29,12 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 
-import com.dyman.bluedoor.Global;
+import com.dyman.componentdoor.Global;
+import com.orhanobut.logger.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +45,6 @@ import java.util.UUID;
  * 在一个给定的蓝牙4.0 BLE设备中，此服务用来管理与该设备 连接和数据通信   在android 系统4.4及以上设备
  */
 @SuppressWarnings("ALL")
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothLeService extends Service {
 
     public static final String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -55,9 +52,8 @@ public class BluetoothLeService extends Service {
     public static final String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public static final String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public static final String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
-    public static final String ACTION_GATT_CONNECT_FAILED = "com.example.bluetooth.le.ACTION_GATT_CONNECT_FAILED";
-
-    public static String HEART_RATE_MEASUREMENT = "00002a29-0000-1000-8000-00805f9b34fb";
+  
+    public static String HEART_RATE_MEASUREMENT = "00002a29-0000-1000-8000-00805f9b34fb";  //心率测量
     public static String CLIENT_CHARACTERISTIC_CONFIG = "0000ffe1-0000-1000-8000-00805f9b34fb";
     public static final UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString(HEART_RATE_MEASUREMENT);
     public static final UUID UUID_CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG);
@@ -82,38 +78,32 @@ public class BluetoothLeService extends Service {
         //当连接上设备或者失去连接时会回调该函数
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            Log.i(TAG, "BluetoothLeService -->" + "=======status:" + status + "=======newState:" + newState);
-//            Toast.makeText(BluetoothLeService.this,"进入回调",Toast.LENGTH_SHORT).show();
+            Logger.e("door", "BluetoothLeService -->" + "=======status:" + status + "=======newState:" + newState);
+
             String intentAction;
 
             //连上设备
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-//                Toast.makeText(BluetoothLeService.this,"lianjie",Toast.LENGTH_SHORT).show();
-                //TODO:2017-8-5
+                Logger.i("door", "连上设备");
                 Global.Varible.isBluetoothConnected = true;
                 //通知广播设备连上
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
-                //寻找服务
+
                 Log.i(TAG, "BluetoothLeService -->" + "Connected to GATT server.  Attempting to start BluetoothLeService discovery:" + mBluetoothGatt.discoverServices());
 
                 //断开设备
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+
+                Logger.i("door", "断开设备");
                 Global.Varible.isBluetoothConnected = false;
                 //通知广播设备断开
-                //TODO:2017-8-5
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
 
                 Log.i(TAG, "BluetoothLeService -->" + "Disconnected from GATT server.");
-            }else{
-                //TODO:2017-8-7 连接失败
-                intentAction = ACTION_GATT_CONNECT_FAILED;
-                mConnectionState = STATE_DISCONNECTED;
-                broadcastUpdate(intentAction);
-                Log.i(TAG, "BluetoothLeService -->" + "Unable to connect GATT server.");
             }
         }
 
@@ -200,7 +190,6 @@ public class BluetoothLeService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        disconnect();
         close();
         return super.onUnbind(intent);
     }
@@ -224,7 +213,6 @@ public class BluetoothLeService extends Service {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
             return false;
         }
-
         return true;
     }
 
@@ -234,23 +222,19 @@ public class BluetoothLeService extends Service {
         //检查蓝牙适配器和地址
         if (mBluetoothAdapter == null || address == null) {
             Log.i(TAG, "BluetoothLeService -->BluetoothAdapter not initialized or unspecified address.");
-            Toast.makeText(this,"没有初始化蓝牙适配器", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        //这里先注释掉，调用connect会返回false
-//        //检查是否重新连接
-//        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
-//            Log.i(TAG, "Trying to use an existing mBluetoothGatt for connection.");
-//            if (mBluetoothGatt.connect()) {
-//                Toast.makeText(this,"重新连接",Toast.LENGTH_SHORT).show();
-//                mConnectionState = STATE_CONNECTING;
-//                return true;
-//            } else {
-//                Toast.makeText(this,"重新连接失败",Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-//        }
+        //检查是否重新连接
+        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
+            Log.i(TAG, "Trying to use an existing mBluetoothGatt for connection.");
+            if (mBluetoothGatt.connect()) {
+                mConnectionState = STATE_CONNECTING;
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(Global.Const.MAC);
 
@@ -260,7 +244,6 @@ public class BluetoothLeService extends Service {
         }
 
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
-
         Log.i(TAG, "BluetoothLeService -->Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
@@ -277,7 +260,6 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.disconnect();
-        close();
     }
 
     /**
@@ -397,10 +379,5 @@ public class BluetoothLeService extends Service {
         BluetoothLeService getService() {
             return BluetoothLeService.this;
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 }

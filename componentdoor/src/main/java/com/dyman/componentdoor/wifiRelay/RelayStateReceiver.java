@@ -1,11 +1,10 @@
-package com.dyman.bluedoor.wifiRelay;
+package com.dyman.componentdoor.wifiRelay;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.dyman.bluedoor.util.ToastUtil;
-
+import com.dyman.componentdoor.util.ToastUtil;
 
 /**
  * Created by thinkjoy on 2017/8/22.

@@ -1,4 +1,4 @@
-package com.dyman.bluedoor.util;
+package com.dyman.componentdoor.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,9 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dyman.bluedoor.Global;
-import com.dyman.bluedoor.R;
-
+import com.dyman.componentdoor.Global;
+import com.dyman.componentdoor.R;
 
 /**
  * 吐司信息打印类
