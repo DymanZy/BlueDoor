@@ -32,9 +32,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-
 import com.dyman.componentdoor.Global;
-import com.orhanobut.logger.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,13 +76,13 @@ public class BluetoothLeService extends Service {
         //当连接上设备或者失去连接时会回调该函数
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            Logger.e("door", "BluetoothLeService -->" + "=======status:" + status + "=======newState:" + newState);
+            Log.i(TAG, "BluetoothLeService -->" + "=======status:" + status + "=======newState:" + newState);
 
             String intentAction;
 
             //连上设备
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Logger.i("door", "连上设备");
+
                 Global.Varible.isBluetoothConnected = true;
                 //通知广播设备连上
                 intentAction = ACTION_GATT_CONNECTED;
@@ -96,7 +94,6 @@ public class BluetoothLeService extends Service {
                 //断开设备
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 
-                Logger.i("door", "断开设备");
                 Global.Varible.isBluetoothConnected = false;
                 //通知广播设备断开
                 intentAction = ACTION_GATT_DISCONNECTED;

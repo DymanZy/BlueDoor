@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.dyman.componentdoor.Global;
 import com.dyman.componentdoor.util.TextUtil;
-import com.dyman.componentdoor.util.ToastUtil;
 import com.dyman.componentdoor.util.countdowntimer.CountDownTimer;
 import com.orhanobut.logger.Logger;
 
@@ -66,10 +65,10 @@ public class BluetoothUtil {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
 
             if (!mBluetoothLeService.initialize()) {
-                Logger.e("door", "Unable to initialize Bluetooth");
+                Log.e(TAG, "Unable to initialize Bluetooth");
                 return;
             }
-            Logger.i("door", "蓝牙设备链接开始");
+            Log.i(TAG, "蓝牙设备链接开始");
 //                Toast.makeText(context,"开始链接蓝牙设备",Toast.LENGTH_SHORT).show();
             mBluetoothLeService.connect(Global.Const.MAC);
         }
@@ -88,34 +87,6 @@ public class BluetoothUtil {
         this.context = context;
         //扫描蓝牙设备
         scanBLEDevice();
-
-//        connectBLE();
-    }
-
-
-    private void connectBLE() {
-        //蓝牙服务
-        if (mBluetoothLeService != null) {
-            Logger.i("door", "BluetoothLeService已被实例化，直接连接MAC地址");
-            if (mBluetoothLeService.connect(Global.Const.MAC)) {
-                Logger.i("door", "连接蓝牙地址成功");
-            } else {
-                Logger.e("door", "连接蓝牙地址失败");
-            }
-            return;
-        }
-        Intent gattServiceIntent = new Intent(context, BluetoothLeService.class);
-        Logger.i("door", "蓝牙服务绑定");
-        boolean bll = context.bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
-        if (bll) {
-//                    Toast.makeText(context, "蓝牙服务绑定成功", Toast.LENGTH_LONG).show();
-            Logger.i("door", "蓝牙服务绑定服务成功");
-
-        } else {
-            Toast.makeText(context, "蓝牙服务绑定服务失败", Toast.LENGTH_LONG).show();
-            Logger.i("door", "蓝牙服务绑定服务失败");
-        }
     }
 
 
@@ -124,15 +95,15 @@ public class BluetoothUtil {
         // 蓝牙服务
         Intent gattServiceIntent = new Intent(context, BluetoothLeService.class);
 
-        Logger.i("door", "蓝牙服务绑定");
+        Log.i(TAG, "蓝牙服务绑定");
         boolean bll = context.bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         if (bll) {
 //            Toast.makeText(context, "蓝牙服务绑定服务成功", Toast.LENGTH_LONG).show();
-            Logger.i("door", "蓝牙服务绑定服务成功");
+            Log.i(TAG, "蓝牙服务绑定服务成功");
 
         } else {
             Toast.makeText(context, "蓝牙服务绑定服务失败", Toast.LENGTH_LONG).show();
-            Logger.e("door", "蓝牙服务绑定服务失败");
+            Log.i(TAG, "蓝牙服务绑定服务失败");
         }
     }
 
@@ -165,8 +136,7 @@ public class BluetoothUtil {
         public void onFinish() {
             mBluetoothAdapter.stopLeScan(bleScanCallback);
             isScanning = false;
-            ToastUtil.showDebugMessage(context, "扫描结束，未发现设备");
-            Logger.i("door", "蓝牙--------扫描结束，未发现设备");
+            Logger.d("door", "蓝牙--------扫描结束，未发现设备");
         }
     };
 
@@ -177,7 +147,6 @@ public class BluetoothUtil {
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
             Logger.i("door", "搜索到的蓝牙地址： "+device.getAddress());
-            ToastUtil.showDebugMessage(context, "搜索到的蓝牙地址： "+device.getAddress());
             if (device.getAddress().equals(Global.Const.MAC)){
                 mBluetoothAdapter.stopLeScan(bleScanCallback);
                 countDownTimer.cancel();
@@ -185,7 +154,6 @@ public class BluetoothUtil {
                 //蓝牙服务
                 if (mBluetoothLeService != null) {
                     Logger.i("door", "BluetoothLeService已被实例化，直接连接MAC地址");
-                    ToastUtil.showDebugMessage(context, "BluetoothLeService已被实例化，直接连接MAC地址");
                     mBluetoothLeService.connect(Global.Const.MAC);
                     return;
                 }
@@ -203,7 +171,6 @@ public class BluetoothUtil {
                 }
             }
         }
-
     }
 
     /**
@@ -211,7 +178,7 @@ public class BluetoothUtil {
      */
     public void writeData(byte[] data) {
 
-        if (mBluetoothLeService == null) {
+        if (mBluetoothLeService == null || !Global.Varible.isBluetoothConnected) {
             //TODO：2017-8-7
             Toast.makeText(context, "蓝牙设备未连接", Toast.LENGTH_LONG).show();
             Logger.i("door", "蓝牙设备未连接, 尝试重连");
